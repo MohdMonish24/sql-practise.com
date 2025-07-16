@@ -257,3 +257,365 @@ ORDER BY city ASC;
 ```
 
 ---
+### Section2: Medium
+
+---
+
+Questions 1- 23
+1. Show unique birth years from patients and order them by ascending.
+
+```
+-- SQL
+SELECT DISTINCT(YEAR(birth_date)) AS unique_years
+FROM patients
+ORDER BY YEAR(birth_date) ASC;
+
+```
+
+2. Show unique first names from the patients table which only occurs once in the list.
+   For example, if two or more people are named 'John' in the first_name column then don't include their name in the output list.
+   If only 1 person is named 'Leo' then include them in the output.
+
+```sql
+SELECT first_name
+FROM patients
+GROUP BY first_name
+HAVING COUNT(first_name) = 1;
+
+```
+
+    Tip: HAVING clause was added to SQL because the WHERE keyword cannot be used with aggregate functions.
+
+3. Show patient_id and first_name from patients where their first_name start and ends with 's' and is at least 6 characters long.
+
+```sql
+SELECT patient_id, first_name
+FROM patients
+WHERE first_name SIMILAR TO 's____%s';
+
+```
+-- alternative #1
+```sql
+SELECT patient_id, first_name
+FROM patients
+WHERE first_name LIKE 's____%s';
+```
+
+4. Show patient_id, first_name, last_name from patients whos diagnosis is 'Dementia'.
+   Primary diagnosis is stored in the admissions table.
+
+```sql
+SELECT p.patient_id, p.first_name, p.last_name
+FROM patients p
+         JOIN admissions a
+ON p.patient_id = a.patient_id
+WHERE a.diagnosis = 'Dementia';
+
+```
+
+5. Display every patient's first_name.
+   Order the list by the length of each name and then by alphbetically.
+
+```sql
+SELECT first_name
+FROM patients
+ORDER BY LENGTH(first_name), first_name;
+```
+
+6. Show the total amount of male patients and the total amount of female patients in the patients table.
+   Display the two results in the same row.
+
+```sql
+-- Postgresql
+SELECT (SELECT COUNT(*) FROM patients WHERE gender = 'M') AS male_count,
+       (SELECT COUNT(*) FROM patients WHERE gender = 'F') AS female_count;
+
+-- alternative #1
+-- SQL
+SELECT SUM(gender = 'M') AS male_count,
+       SUM(gender = 'F') AS female_count
+FROM patients;
+```
+
+7. Show the total amount of male patients and the total amount of female patients in the patients table.
+   Display the two results in the same row.
+
+```sql
+SELECT first_name, last_name, allergies
+FROM patients
+WHERE allergies = 'Penicillin'
+   OR allergies = 'Morphine'
+ORDER BY allergies ASC, first_name ASC, last_name ASC;
+
+-- alternatively 
+
+SELECT first_name,
+       last_name,
+       allergies
+FROM patients
+WHERE allergies IN ('Penicillin', 'Morphine')
+ORDER BY allergies,
+         first_name,
+         last_name;
+```
+
+8. Show patient_id, diagnosis from admissions. Find patients admitted multiple times for the same diagnosis.
+
+```sql
+SELECT patient_id, diagnosis
+FROM admissions
+GROUP BY patient_id, diagnosis
+HAVING COUNT(diagnosis = diagnosis) > 1;
+```
+
+9. Show the city and the total number of patients in the city.
+   Order from most to least patients and then by city name ascending.
+
+```sql
+SELECT city, COUNT(*) AS number_of_patients
+FROM patients
+GROUP BY city
+ORDER BY number_of_patients DESC, city ASC;
+```
+
+10. Show first name, last name and role of every person that is either patient or doctor.
+    The roles are either "Patient" or "Doctor"
+
+```sql
+SELECT first_name, last_name, 
+'Patient' AS 'role'
+ FROM patients
+UNION ALL
+select first_name, last_name, 'Doctor' 
+FROM doctors;
+```
+
+
+
+11. Show all allergies ordered by popularity. Remove NULL values from query.
+
+```sql
+SELECT allergies, 
+COUNT(*) AS total_diagnosis
+FROM patients
+GROUP BY allergies
+HAVING allergies IS NOT NULL;
+ORDER BY total_diagnosis DESC;
+```
+
+
+12. Show all patient's first_name, last_name, and birth_date who were born in the 1970s decade.
+    Sort the list starting from the earliest birth_date.
+
+```sql
+--PostgreSQL version
+SELECT first_name, last_name, birth_date
+FROM patients
+WHERE EXTRACT(YEAR FROM birth_date) BETWEEN 1970 AND 1979;
+
+--SQL
+SELECT first_name,
+       last_name,
+       birth_date
+FROM patients
+WHERE YEAR(birth_date) BETWEEN 1970 AND 1979
+ORDER BY birth_date ASC;
+
+-- SQL Regex
+SELECT first_name,
+       last_name,
+       birth_date
+FROM patients
+WHERE year(birth_date) LIKE '197%'
+ORDER BY birth_date ASC
+```
+
+13. We want to display each patient's full name in a single column.
+    Their last_name in all upper letters must appear first, then first_name in all lower case letters.
+    Separate the last_name and first_name with a comma. Order the list by the first_name in decending order
+    EX: SMITH,jane
+
+```sql
+SELECT CONCAT(UPPER(last_name), ',', LOWER(first_name)) AS new_name_format
+FROM patients
+ORDER BY first_name DESC;
+
+```
+
+14. Show the province_id(s), sum of height; where the total sum of its patient's height is greater than or equal to 7,000.
+
+```sql
+SELECT pr.province_id,
+SUM(pa.height) AS sum_height
+FROM province_names pr
+         JOIN patients pa ON pr.province_id = pa.province_id
+GROUP BY pr.province_id
+HAVING SUM(pa.height) >= 7000;
+```
+-- alternatively 
+```sql
+SELECT province_id, 
+SUM(height) AS total_height
+FROM patients
+GROUP BY province_id
+HAVING total_height > 7000;
+```
+
+15. Show the difference between the largest weight and smallest weight for patients with the last name 'Maroni'
+
+```sql
+SELECT (MAX(weight) - MIN(weight)) AS weight_delta
+FROM patients
+WHERE last_name = 'Maroni';
+```
+
+
+16. Show all of the days of the month (1-31) and how many admission_dates occurred on that day.
+    Sort by the day with most admissions to least admissions.
+
+```sql
+-- PostgreSQL
+SELECT EXTRACT(DAY FROM admission_date) AS day_number, COUNT(patient_id) AS number_of_admissions
+FROM admissions
+GROUP BY day_number
+ORDER BY number_of_admissions DESC;
+
+-- SQL
+SELECT DAY(admission_date) AS date, 
+COUNT(admission_date) AS admissions
+FROM admissions
+GROUP BY date
+ORDER BYadmissions DESC;
+```
+
+
+17. Show all columns for patient_id 542's most recent admission_date.
+
+```sql
+-- PostgreSQL
+SELECT *
+FROM admissions
+WHERE patient_id = 542
+GROUP BY patient_id, admission_date, discharge_date, diagnosis, attending_doctor_id
+HAVING admission_date = MAX(admission_date);
+
+-- alternatively 
+-- sql
+SELECT *
+FROM admissions
+WHERE patient_id = 542
+ORDER BY admission_date DESC
+LIMIT 1;
+
+-- alternatively 
+SELECT *
+FROM admissions
+WHERE patient_id = 542
+GROUP BY patient_id
+HAVING admission_date = MAX(admission_date);
+```
+
+18. Show patient_id, attending_doctor_id, and diagnosis for admissions that match one of the two criteria:
+    - patient_id is an odd number and attending_doctor_id is either 1, 5, or 19.
+    - attending_doctor_id contains a 2 and the length of patient_id is 3 characters.
+
+```sql
+-- PostgreSQL (we would need to explicity cast the type attending_doctor_id is integer whereas LIKE method performs operations on Strings
+SELECT patient_id, attending_doctor_id, diagnosis
+FROM admissions
+WHERE patient_id % 2 = 1 AND attending_doctor_id IN (1, 5, 19)
+   OR CONCAT(attending_doctor_id) LIKE '%2%' AND LENGTH(CONCAT(patient_id)) = 3;
+
+-- SQL
+SELECT patient_id, attending_doctor_id, diagnosis
+FROM admissions
+WHERE 
+(patient_id%2 != 0 AND attending_doctor_id IN (1, 5, 19))
+OR
+(LEN(patient_id) = 3 AND attending_doctor_id LIKE  '%2%');
+```
+
+
+
+19. Show first_name, last_name, and the total number of admissions attended for each doctor.
+    Every admission has been attended by a doctor.
+
+```sql
+SELECT 
+d.first_name, d.last_name,
+COUNT(a.attending_doctor_id) AS addmissions_total
+FROM doctors d
+JOIN admissions a
+ON d.doctor_id = a.attending_doctor_id
+GROUP BY d.doctor_id;
+```
+
+
+
+20. For each doctor, display their id, full name, and the first and last admission date they attended.
+
+```sql
+SELECT 
+d.doctor_id,
+   CANCAT(d.first_name, ' ', d.last_name) AS full_name,
+   MIN(a.admission_date) AS first_addmission_date,
+   MAX(a.admission_date) AS last_addmission_date
+FROM doctors d
+JOIN admissions a
+ON  d.doctor_id = a.attending_doctor_id
+GROUP BY d.doctor_id;
+```
+
+
+
+21. Display the total amount of patients for each province. Order by descending.
+
+```sql
+SELECT p.province_name, 
+COUNT(*) AS patient_count
+FROM province_names p
+JOIN patients pa
+ON p.province_id = pa.province_id
+GROUP BY p.province_name
+ORDER BY  patient_count DESC;
+```
+
+
+22. For every admission, display the patient's full name, their admission diagnosis, and their doctor's full name who diagnosed their problem.
+
+```sql
+SELECT
+CONCAT(p.first_name, " ", p.last_name) AS patient_full_name, a.diagnosis, 
+CONCAT(d.first_name, " ", d.last_name) AS doc_full_name 
+FROM patients as p  
+JOIN admissions AS a         
+ON p.patient_id = a.patient_id      
+JOIN doctors AS d         
+ON d.doctor_id = a.attending_doctor_id;
+
+```
+
+23. Display the number of duplicate patients based on their first_name and last_name.
+
+```sql
+
+SELECT first_name, last_name, 
+COUNT(*) AS num_of_duplicates 
+FROM patients 
+GROUP BY first_name, last_name 
+HAVIN COUNT(*) > 1;
+
+/*
+In the HAVING clause, you can only use the names of columns that are included in the GROUP BY clause 
+or that are aggregated by an aggregate function (such as COUNT, MAX, MIN, etc.).
+
+In this case, the COUNT(*) function is used to count the number of rows in each group, 
+and the result of this function is given an alias of "number_of_duplicates".
+However, the HAVING clause does not refer to this alias. Instead, it refers to the function itself (i.e. COUNT(*)).
+*/
+
+```
+---
+### Section3: Hard
+
+---
