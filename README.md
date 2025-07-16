@@ -265,11 +265,10 @@ Questions 1- 23
 1. Show unique birth years from patients and order them by ascending.
 
 ```
--- SQL
+ SQL
 SELECT DISTINCT(YEAR(birth_date)) AS unique_years
 FROM patients
 ORDER BY YEAR(birth_date) ASC;
-
 ```
 
 2. Show unique first names from the patients table which only occurs once in the list.
@@ -293,9 +292,7 @@ SELECT patient_id, first_name
 FROM patients
 WHERE first_name SIMILAR TO 's____%s';
 
-```
 -- alternative #1
-```sql
 SELECT patient_id, first_name
 FROM patients
 WHERE first_name LIKE 's____%s';
@@ -330,8 +327,8 @@ ORDER BY LENGTH(first_name), first_name;
 SELECT (SELECT COUNT(*) FROM patients WHERE gender = 'M') AS male_count,
        (SELECT COUNT(*) FROM patients WHERE gender = 'F') AS female_count;
 
+
 -- alternative #1
--- SQL
 SELECT SUM(gender = 'M') AS male_count,
        SUM(gender = 'F') AS female_count
 FROM patients;
@@ -451,9 +448,9 @@ FROM province_names pr
          JOIN patients pa ON pr.province_id = pa.province_id
 GROUP BY pr.province_id
 HAVING SUM(pa.height) >= 7000;
-```
--- alternatively 
-```sql
+
+-- alternatively
+
 SELECT province_id, 
 SUM(height) AS total_height
 FROM patients
@@ -500,7 +497,7 @@ GROUP BY patient_id, admission_date, discharge_date, diagnosis, attending_doctor
 HAVING admission_date = MAX(admission_date);
 
 -- alternatively 
--- sql
+
 SELECT *
 FROM admissions
 WHERE patient_id = 542
@@ -535,8 +532,6 @@ OR
 (LEN(patient_id) = 3 AND attending_doctor_id LIKE  '%2%');
 ```
 
-
-
 19. Show first_name, last_name, and the total number of admissions attended for each doctor.
     Every admission has been attended by a doctor.
 
@@ -549,8 +544,6 @@ JOIN admissions a
 ON d.doctor_id = a.attending_doctor_id
 GROUP BY d.doctor_id;
 ```
-
-
 
 20. For each doctor, display their id, full name, and the first and last admission date they attended.
 
@@ -566,8 +559,6 @@ ON  d.doctor_id = a.attending_doctor_id
 GROUP BY d.doctor_id;
 ```
 
-
-
 21. Display the total amount of patients for each province. Order by descending.
 
 ```sql
@@ -579,7 +570,6 @@ ON p.province_id = pa.province_id
 GROUP BY p.province_name
 ORDER BY  patient_count DESC;
 ```
-
 
 22. For every admission, display the patient's full name, their admission diagnosis, and their doctor's full name who diagnosed their problem.
 
