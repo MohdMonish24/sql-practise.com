@@ -8,8 +8,6 @@ I have used PostgreSQL as main Database Management Systems (DBMS) and therefore 
 other DBMS such as SQL Server or MySQL as some implementations slight vary in syntax. For such cases, for example, in date and time operations 
 I included standart SQL queries as well.
 
-I populated mockdata using www.mockaroo.com to effectively practise the queries and get some output while working locally. Note that it is not the same large dataset used on the web site, so I suggest you use the web site itself as long as you have internet connection, which is also good for tracking your progress. You may use the sql database files given in the repository for convenience and a rapid start in creating schemas and inserting datasets.
-
 The hospital test contains 50 questions and consists of 3 category:
 
 - Easy
