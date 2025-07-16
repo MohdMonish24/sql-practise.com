@@ -10,8 +10,6 @@ I included standart SQL queries as well.
 
 I populated mockdata using www.mockaroo.com to effectively practise the queries and get some output while working locally. Note that it is not the same large dataset used on the web site, so I suggest you use the web site itself as long as you have internet connection, which is also good for tracking your progress. You may use the sql database files given in the repository for convenience and a rapid start in creating schemas and inserting datasets.
 
-Recently, SQL-Practise has introduced a new database called Northwind. I have added its solutions to a separate page, which you can access from [here](https://github.com/gulbalasalamov/sql-practise.com/blob/master/README-NORTHWIND.md) . However, I strongly recommend you to start with the Hospital database for practice. It offers a wide variety of questions and allows you to practice more functional features. 
-
 The hospital test contains 50 questions and consists of 3 category:
 
 - Easy
@@ -33,15 +31,15 @@ relate to other entities.
 ### Section1: Easy
 
 ---
+
 Questions 1- 17
 
-1. Show first name, last name, and gender of patients whose gender is ‘M’
+1. Show first name, last name, and gender of patients who's gender is 'M'
 
-SELECT
-  first_name,last_name,gender
+```sql
+SELECT first_name,
+       last_name,
+       gender
 FROM patients
 WHERE gender = 'M';
-
-
-
 ```
